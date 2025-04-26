@@ -7,9 +7,9 @@
 
 :root {
     --bg-color: #e0e0e0;
-    --button-bg: #000;
-    --button-hover: #333;
-    --button-active: #666;
+    --button-bg: #808080;
+    --button-hover: #666666;
+    --button-active: #4d4d4d;
     --cell-bg: #f0f0f0;
     --cell-border: #e0e0e0;
     --grid-border: #ccc;
@@ -76,17 +76,27 @@ body {
     background-color: var(--empty-cell-bg);
 }
 
+.grid-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 60/40;
+    min-height: 0;
+    min-width: 0;
+}
+
 #grid {
     display: grid;
     grid-template-columns: repeat(60, 1fr);
     grid-template-rows: repeat(40, 1fr);
     width: 100%;
-    aspect-ratio: 60/40;
+    height: 100%;
     max-width: 1280px;
     border: 1px solid var(--grid-border);
     background-color: var(--cell-bg);
     transition: background-color 0.3s, border-color 0.3s;
     border-radius: 4px;
+    min-height: 0;
+    min-width: 0;
 }
 
 .cell {
@@ -99,33 +109,62 @@ body {
     justify-content: center;
     align-items: center;
     font-size: 0.75em;
-    background-color: var(--cell-bg);
+    background-color: var(--empty-cell-bg);
     min-width: 0;
     min-height: 0;
+    overflow: hidden;
 }
 
-.cell.empty, .cell.poop {
+.cell.empty, .cell.poop, .cell.tree, .cell.apple, .cell.building, .cell.construction, .cell.prayer, .cell.nuts, .cell.fence, .cell.cocoon, .cell.tree2 {
     background-color: var(--empty-cell-bg);
 }
 
-.cell.tree {
-    background-color: var(--tree-bg);
+.tooltip-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
 }
 
-.cell.apple {
-    background-color: var(--apple-bg);
+.tooltip-element {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: monospace;
+    font-size: 12px;
+    color: white;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: all 0.2s;
+    z-index: 2;
+    background-color: transparent;
 }
 
-.cell.building {
-    background-color: var(--building-bg);
+.tooltip-element:hover::after {
+    content: attr(data-value);
+    position: absolute;
+    background-color: var(--button-bg);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    z-index: 1000;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    transform: translateY(-8px);
 }
 
-.cell.construction {
-    background-color: var(--construction-bg);
-}
-
-.cell.prayer {
-    background-color: var(--prayer-bg);
+[data-theme="dark"] .tooltip-element:hover::after {
+    background-color: var(--button-bg);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .controls {
@@ -167,7 +206,6 @@ body {
     background-color: var(--button-active);
 }
 
-/* Add extra space between Share and Save buttons */
 #shareButton {
     margin-right: 30px;
 }
@@ -190,7 +228,8 @@ body {
 }
 
 [data-theme="dark"] .theme-toggle {
-    /* content property removed */
+    background-color: var(--button-bg);
+    color: white;
 }
 
 .brush-selector {
@@ -210,6 +249,11 @@ body {
     gap: 5px;
 }
 
+.brush-group-spacer {
+    height: 8px;
+    width: 100%;
+}
+
 .brush-button {
     padding: 8px;
     border: none;
@@ -220,8 +264,19 @@ body {
     transition: all 0.3s;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     font-size: 16px;
+    width: 100%;
+}
+
+.brush-button .emoji {
+    font-size: 16px;
+}
+
+.brush-button .counter {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-left: 8px;
 }
 
 .brush-button:hover {
@@ -231,6 +286,58 @@ body {
 .brush-button.active {
     background-color: var(--button-active);
     transform: scale(1.05);
+}
+
+.numeric-input-container {
+    margin-top: 10px;
+    padding: 8px;
+    background-color: var(--button-bg);
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.numeric-input {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--button-bg);
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    transition: all 0.3s;
+    font-family: monospace;
+}
+
+.numeric-input:focus {
+    outline: none;
+    background-color: var(--button-hover);
+}
+
+.numeric-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .numeric-input {
+    background-color: var(--button-bg);
+    color: white;
+    border: 1px solid var(--cell-border);
+}
+
+[data-theme="dark"] .numeric-input:focus {
+    background-color: var(--button-hover);
+    border-color: var(--button-hover);
+}
+
+[data-theme="light"] .numeric-input {
+    background-color: var(--button-bg);
+    color: white;
+    border: 1px solid var(--cell-border);
+}
+
+[data-theme="light"] .numeric-input:focus {
+    background-color: var(--button-hover);
+    border-color: var(--button-hover);
 }
 
 .emoji-counter {
@@ -267,3 +374,109 @@ body {
 [data-theme="dark"] .emoji-counter {
     background-color: var(--empty-cell-bg);
 }
+
+.version-link {
+    position: absolute;
+    left: 0;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background-color: var(--button-bg);
+    color: white;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    margin: 0;
+}
+
+.version-link:hover {
+    background-color: var(--button-hover);
+}
+
+.version-link:active {
+    background-color: var(--button-active);
+}
+
+.level-controls {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    background-color: var(--button-bg);
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.level-button {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    background-color: transparent;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.level-button:hover {
+    background-color: var(--button-hover);
+}
+
+.level-button.active {
+    background-color: var(--button-active);
+    transform: scale(1.02);
+}
+
+.level-input {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    background-color: transparent;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    transition: all 0.3s;
+    font-family: 'Manrope', sans-serif;
+}
+
+.level-input:focus {
+    outline: none;
+    background-color: var(--button-hover);
+}
+
+.level-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .level-input {
+    background-color: transparent;
+    color: white;
+    border: 1px solid var(--cell-border);
+}
+
+[data-theme="dark"] .level-input:focus {
+    background-color: var(--button-hover);
+    border-color: var(--button-hover);
+}
+
+[data-theme="light"] .level-input {
+    background-color: transparent;
+    color: white;
+    border: 1px solid var(--cell-border);
+}
+
+[data-theme="light"] .level-input:focus {
+    background-color: var(--button-hover);
+    border-color: var(--button-hover);
+} 
